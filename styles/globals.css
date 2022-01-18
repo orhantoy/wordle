@@ -75,3 +75,14 @@ a {
   border-color: var(--bg-color);
   color: white;
 }
+
+.fallback-input {
+  text-transform: "uppercase";
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+  .fallback-input {
+    display: none;
+  }
+}

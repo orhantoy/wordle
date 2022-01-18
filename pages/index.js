@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useReducer } from "react";
+import Head from "next/head";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 
 const nGuesses = 6;
 const wordleLength = 5;
@@ -57,6 +58,7 @@ function reducer(state, action) {
 }
 
 export default function Home() {
+  const inputRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const { guess, guessError, history, outcome } = state;
 
@@ -72,6 +74,7 @@ export default function Home() {
 
     if (res.ok) {
       dispatch({ type: actionTypes.ACCEPT_RESPONSE, response: jsonResponse });
+      inputRef.current.value = "";
     } else if (jsonResponse && "error" in jsonResponse) {
       dispatch({ type: actionTypes.ACCEPT_ERROR, response: jsonResponse });
     } else {
@@ -99,8 +102,22 @@ export default function Home() {
     return () => window.removeEventListener("keyup", onKeyUp);
   }, [outcome, submitWordle]);
 
+  useEffect(() => {
+    inputRef.current.focus();
+  }, []);
+
   return (
     <div className="wordle-container">
+      <Head>
+        <title>Wordle with React</title>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
+        />
+      </Head>
+
+      <input className="fallback-input" type="text" ref={inputRef} />
+
       <Grid guess={guess} guessError={guessError} history={history} />
       {outcome === "win" && (
         <div style={{ color: "green", textAlign: "center", padding: "1rem" }}>
