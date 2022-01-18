@@ -42,7 +42,7 @@ function reducer(state, action) {
     case actionTypes.ACCEPT_RESPONSE:
       return {
         ...state,
-        history: state.history.concat({ letters: action.response.result }),
+        history: state.history.concat({ letters: action.response.letters }),
         guess: initialState.guess,
         outcome: action.response.outcome,
       };

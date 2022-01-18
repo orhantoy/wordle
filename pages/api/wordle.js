@@ -4,7 +4,8 @@ const fs = require("fs");
 const seedrandom = require("seedrandom");
 
 const wordFilePath = "/usr/share/dict/words";
-let dictionary
+const wordleLength = 5;
+let dictionary;
 
 try {
   const fileData = fs.readFileSync(wordFilePath, "utf8");
@@ -13,29 +14,45 @@ try {
   console.error(err);
 }
 
+let wordCache = new Map();
+
 async function getWordle() {
+  // Generate seed from current time, with the minutes, seconds and milliseconds set to 0.
   const date = new Date();
   date.setMinutes(0, 0, 0);
   const seed = date.toUTCString();
-  const rng = seedrandom(seed);
-  const randomDictionaryIndex = Math.round(rng() * dictionary.length);
 
-  let randomWord = null
-  for (let i = randomDictionaryIndex; randomWord === null; i++) {
-    if (dictionary[i].length === 5) {
-      randomWord = dictionary[i];
+  if (!wordCache.has(seed)) {
+    const rng = seedrandom(seed);
+    const randomDictionaryIndex = Math.round(rng() * dictionary.length);
+
+    let randomWord = null;
+    for (
+      let i = randomDictionaryIndex;
+      randomWord === null;
+      i = (i + 1) % dictionary.length
+    ) {
+      if (dictionary[i].length === wordleLength) {
+        randomWord = dictionary[i];
+      }
     }
+
+    wordCache.set(seed, randomWord);
   }
 
-  return {
-    seed: seed,
-    wordle: randomWord,
-  };
+  console.log({ seed: seed, word: wordCache.get(seed) });
+  return wordCache.get(seed);
 }
+
+const resultTypes = {
+  CorrectPosition: "correct",
+  InWord: "in-word",
+  NotInWord: "not-in-word",
+};
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
-    const { wordle } = await getWordle();
+    const wordle = await getWordle();
     const { guess } = req.body;
 
     if (!guess || typeof guess !== "string") {
@@ -43,7 +60,7 @@ export default async function handler(req, res) {
       return;
     }
 
-    if (guess.length !== 5) {
+    if (guess.length !== wordleLength) {
       res.status(400).json({ error: "Guess must consist of 5 characters" });
       return;
     }
@@ -53,31 +70,29 @@ export default async function handler(req, res) {
       return;
     }
 
-    let result = new Array(5);
-    for (let i = 0; i < result.length; i++) {
-      const letter = wordle.charAt(i);
+    let letters = new Array(wordleLength);
+    for (let i = 0; i < letters.length; i++) {
       const guessedLetter = guess.charAt(i);
+      let result;
 
-      if (letter === guessedLetter) {
-        result[i] = {
-          result: "correct",
-        };
+      if (wordle.charAt(i) === guessedLetter) {
+        result = resultTypes.CorrectPosition;
       } else if (wordle.includes(guessedLetter)) {
-        result[i] = {
-          result: "in-word",
-        };
+        result = resultTypes.InWord;
       } else {
-        result[i] = {
-          result: "not-in-word",
-        };
+        result = resultTypes.NotInWord;
       }
 
-      result[i].value = guessedLetter;
+      letters[i] = {
+        value: guessedLetter,
+        result,
+      };
     }
 
     const outcome = wordle === guess ? "win" : null;
 
-    res.status(200).json({ result, outcome });
+    res.status(200).json({ letters, outcome });
+    return;
   }
 
   res.status(404).end();
