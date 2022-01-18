@@ -108,7 +108,7 @@ export default function Home() {
       <Grid guess={guess} guessError={guessError} history={history} />
       {outcome === "win" && (
         <div style={{ color: "green", textAlign: "center", padding: "1rem" }}>
-          You guessed the correct word after
+          You guessed the correct word in
           <br />
           <strong>
             {history.length} attempt{history.length !== 1 && "s"}
