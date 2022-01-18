@@ -33,7 +33,7 @@ a {
   border: 2px solid black;
   font-size: 2rem;
   font-weight: bold;
-  margin: 2px;
+  margin: 4px;
   height: auto;
   flex-grow: 1;
   flex-shrink: 1;
