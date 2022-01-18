@@ -14,3 +14,64 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.wordle-container {
+  max-width: 300px;
+  margin: 2rem auto;
+}
+
+.wordle-guess {
+  display: flex;
+  justify-content: space-between;
+}
+
+.wordle-guess--with-error .wordle-letter {
+  border-color: red;
+}
+
+.wordle-letter {
+  border: 2px solid black;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 2px;
+  height: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+  vertical-align: bottom;
+  position: relative;
+}
+
+.wordle-letter span {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.wordle-letter::before {
+  content: "";
+  float: left;
+  padding-top: 100%;
+}
+
+.wordle-letter--correct {
+  --bg-color: #538d4e;
+}
+
+.wordle-letter--in-word {
+  --bg-color: #b59f3b;
+}
+
+.wordle-letter--not-in-word {
+  --bg-color: #3a3a3c;
+}
+
+.wordle-letter--correct,
+.wordle-letter--in-word,
+.wordle-letter--not-in-word {
+  background-color: var(--bg-color);
+  border-color: var(--bg-color);
+  color: white;
+}
