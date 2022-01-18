@@ -17,10 +17,6 @@ const actionTypes = {
   ACCEPT_ERROR: "ACCEPT_ERROR",
 };
 
-const results = {
-  Unknown: "unknown",
-};
-
 const initialState = {
   guess: "",
   guessError: null,
@@ -134,7 +130,7 @@ function Grid({ guess, guessError, history }) {
   ) {
     currentRow.letters[letterIndex] = {
       value: guess.charAt(letterIndex),
-      result: results.Unknown,
+      result: null,
     };
   }
   grid.push(currentRow);
@@ -145,7 +141,7 @@ function Grid({ guess, guessError, history }) {
     };
 
     for (let j = 0; j < blankRow.letters.length; j++) {
-      blankRow.letters[j] = { value: null, result: results.Unknown };
+      blankRow.letters[j] = { value: null, result: null };
     }
 
     grid.push(blankRow);
@@ -166,14 +162,18 @@ function Guess({ letters, error }) {
 
   return (
     <div className={classNames.join(" ")}>
-      {letters.map((letter, index) => (
-        <div
-          key={index}
-          className={`wordle-letter wordle-letter--${letter.result}`}
-        >
-          <span>{letter.value}</span>
-        </div>
-      ))}
+      {letters.map((letter, index) => {
+        let letterClassNames = ["wordle-letter"];
+        if (letter.result !== null) {
+          letterClassNames.push(`wordle-letter--${letter.result}`);
+        }
+
+        return (
+          <div key={index} className={letterClassNames.join(" ")}>
+            <span>{letter.value}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
