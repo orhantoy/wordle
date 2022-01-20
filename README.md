@@ -14,8 +14,6 @@ yarn dev
 
 - You're currently not limited to 6 guesses
   - If this is resolved, present user with the correct word at the end
-- Improve scenario where a guess contains duplicate letters
-  - Or just disallow words with duplicate letters to avoid situation entirely
 - Parameterize length of word and number of guesses
 - Hard mode (do not show in-word but only if correct position)
 - Better dictionary

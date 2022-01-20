@@ -50,6 +50,49 @@ const resultTypes = {
   NotInWord: "not-in-word",
 };
 
+function guessComparison(guess, correctWord) {
+  if (guess.length !== correctWord.length) {
+    throw "guess and correctWord must be of equal length";
+  }
+
+  let letters = new Array(wordleLength);
+  let remainingLetters = correctWord.split("");
+
+  // First we determine correctly positioned letters
+  for (let i = 0; i < letters.length; i++) {
+    const guessedLetter = guess.charAt(i);
+    let result = null;
+
+    if (correctWord.charAt(i) === guessedLetter) {
+      result = resultTypes.CorrectPosition;
+      remainingLetters[i] = null;
+    }
+
+    letters[i] = {
+      value: guessedLetter,
+      result,
+    };
+  }
+
+  // And then we consider letters that exist in the word, handling duplicates.
+  for (let i = 0; i < letters.length; i++) {
+    if (letters[i].result !== null) {
+      continue;
+    }
+
+    const guessedLetter = guess.charAt(i);
+    const index = remainingLetters.indexOf(guessedLetter);
+    if (index !== -1) {
+      letters[i].result = resultTypes.InWord;
+      remainingLetters[index] = null;
+    } else {
+      letters[i].result = resultTypes.NotInWord;
+    }
+  }
+
+  return letters;
+}
+
 export default async function handler(req, res) {
   if (req.method === "POST") {
     const wordle = await getWordle();
@@ -70,28 +113,10 @@ export default async function handler(req, res) {
       return;
     }
 
-    let letters = new Array(wordleLength);
-    for (let i = 0; i < letters.length; i++) {
-      const guessedLetter = guess.charAt(i);
-      let result;
-
-      if (wordle.charAt(i) === guessedLetter) {
-        result = resultTypes.CorrectPosition;
-      } else if (wordle.includes(guessedLetter)) {
-        result = resultTypes.InWord;
-      } else {
-        result = resultTypes.NotInWord;
-      }
-
-      letters[i] = {
-        value: guessedLetter,
-        result,
-      };
-    }
-
-    const outcome = wordle === guess ? "win" : null;
-
-    res.status(200).json({ letters, outcome });
+    res.status(200).json({
+      letters: guessComparison(guess, wordle),
+      outcome: guess == wordle ? "win" : null,
+    });
     return;
   }
 
