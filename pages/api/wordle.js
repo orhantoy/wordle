@@ -1,21 +1,7 @@
-import { readFileSync } from "fs";
-import path from "path";
 import seedrandom from "seedrandom";
 
-const wordFilePath =
-  process.env["NODE_ENV"] === "development"
-    ? "/usr/share/dict/words"
-    : path.join(__dirname, "_files", "dict-words.txt");
+const dictionary = require("./dictWords.json");
 const wordleLength = 5;
-let dictionary;
-
-try {
-  const fileData = readFileSync(wordFilePath, "utf8");
-  dictionary = fileData.toString().toUpperCase().split("\n");
-} catch (err) {
-  console.error(err);
-}
-
 let wordCache = new Map();
 
 async function getWordle() {
