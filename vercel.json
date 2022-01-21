@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "pages/api/wordle.js": {
+      "includeFiles": "_files/**"
+    }
+  }
+}

@@ -1,14 +1,16 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { readFileSync } from "fs";
+import path from "path";
+import seedrandom from "seedrandom";
 
-const fs = require("fs");
-const seedrandom = require("seedrandom");
-
-const wordFilePath = "/usr/share/dict/words";
+const wordFilePath =
+  process.env["NODE_ENV"] === "development"
+    ? "/usr/share/dict/words"
+    : path.join(__dirname, "_files", "dict-words.txt");
 const wordleLength = 5;
 let dictionary;
 
 try {
-  const fileData = fs.readFileSync(wordFilePath, "utf8");
+  const fileData = readFileSync(wordFilePath, "utf8");
   dictionary = fileData.toString().toUpperCase().split("\n");
 } catch (err) {
   console.error(err);
